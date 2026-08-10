@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>菜品编辑</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-100">
+<script>
+const u = JSON.parse(localStorage.getItem('currentUser'));
+if(!u || u.role !== 'admin'){
+    alert('无权限');
+    location.href='login.html';
+}
+
+let dishList = JSON.parse(localStorage.getItem('dishList')) || [];
+let params = new URLSearchParams(location.search);
+let editId = params.get('id');
+let editDish = null;
+
+if(editId){
+    editDish = dishList.find(d => d.id == editId);
+}
+
+// 页面加载完成再赋值（避免DOM未加载报错）
+window.onload = function(){
+    if(editDish){
+        document.getElementById('dishName').value = editDish.name;
+        document.getElementById('dishPrice').value = editDish.price;
+        document.getElementById('dishCate').value = editDish.cate;
+    }
+}
+
+// 菜品名称校验（核心）
+function checkName(name) {
+    // 1. 不能为空
+    if (!name) {
+        alert("菜品名称不能为空");
+        return false;
+    }
+    // 2. 长度不超过10
+    if (name.length > 10) {
+        alert("菜品名称长度不能超过10个字符");
+        return false;
+    }
+    // 3. 不能以数字开头
+    if (/^\d/.test(name)) {
+        alert("菜品名称不能以数字开头");
+        return false;
+    }
+    // 4. 只允许汉字、英文、数字，无特殊字符
+    if (!/^[\u4e00-\u9fa5a-zA-Z0-9]+$/.test(name)) {
+        alert("菜品名称不能包含特殊符号，仅支持汉字、字母、数字");
+        return false;
+    }
+    return true;
+}
+
+function saveDish(){
+    let name = document.getElementById('dishName').value.trim();
+    let price = document.getElementById('dishPrice').value.trim();
+    let cate = document.getElementById('dishCate').value;
+
+    // 校验名称
+    if (!checkName(name)) return;
+
+    // 校验价格
+    if(!price || isNaN(price) || price <= 0){
+        alert('请输入有效的价格');
+        return;
+    }
+
+    if(editDish){
+        // 编辑
+        editDish.name = name;
+        editDish.price = price;
+        editDish.cate = cate;
+    }else{
+        // 新增
+        let newId = dishList.length > 0 ? Math.max(...dishList.map(d=>d.id)) + 1 : 1;
+        dishList.push({id:newId, name, price, cate});
+    }
+
+    localStorage.setItem('dishList', JSON.stringify(dishList));
+    alert('保存成功！');
+    location.href='admin-dish.html';
+}
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex items-center">
+    <button onclick="location.href='admin-dish.html'" class="text-gray-600 mr-3">
+        <i class="fa fa-arrow-left"></i> 返回
+    </button>
+    <h2 class="text-lg font-bold">菜品编辑</h2>
+</nav>
+
+<div class="p-4 max-w-md mx-auto">
+    <div class="bg-white rounded-lg shadow p-4">
+        <div class="mb-3">
+            <label class="block text-sm mb-1">菜品名称（10字内，汉字/字母/数字，不以数字开头）</label>
+            <input type="text" id="dishName" maxlength="10" class="w-full border px-2 py-2 rounded" placeholder="请输入菜品名称">
+        </div>
+        <div class="mb-3">
+            <label class="block text-sm mb-1">价格</label>
+            <input type="number" id="dishPrice" step="0.01" min="0.01" class="w-full border px-2 py-2 rounded" placeholder="请输入价格">
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm mb-1">分类</label>
+            <select id="dishCate" class="w-full border px-2 py-2 rounded">
+                <option value="热菜">热菜</option>
+                <option value="凉菜">凉菜</option>
+                <option value="饮品">饮品</option>
+            </select>
+        </div>
+        <button onclick="saveDish()" class="w-full py-2 bg-orange-500 text-white rounded-lg">保存菜品</button>
+    </div>
+</div>
+</body>
+</html>

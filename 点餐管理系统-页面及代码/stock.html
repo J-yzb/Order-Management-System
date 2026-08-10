@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>库存物资管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-100">
+<script>
+const loginUser = JSON.parse(localStorage.getItem('currentUser'));
+if (!loginUser || loginUser.role !== 'admin') {
+    alert('权限不足！该模块仅管理员可访问');
+    location.href = 'login.html';
+}
+
+let stockList = JSON.parse(localStorage.getItem('stockList')) || [
+    {id:1, name:'一次性餐具', unit:'套', num:500},
+    {id:2, name:'食用油', unit:'桶', num:20}
+];
+
+function delStock(id){
+    if(confirm('确定删除该物资？')){
+        stockList = stockList.filter(s => s.id !== id);
+        localStorage.setItem('stockList', JSON.stringify(stockList));
+        location.reload();
+    }
+}
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex justify-between items-center">
+    <button onclick="location.href='admin.html'" class="text-gray-600">
+        <i class="fa fa-arrow-left"></i> 返回后台
+    </button>
+    <h2 class="text-lg font-bold">库存物资管理</h2>
+    <button onclick="location.href='stock-edit.html'" class="bg-orange-500 text-white px-3 py-1 rounded text-sm">新增物资</button>
+</nav>
+
+<div class="p-4 mt-4 max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow p-4">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b">
+                    <th class="py-2 text-left">物资名称</th>
+                    <th class="py-2 text-left">规格</th>
+                    <th class="py-2 text-left">当前库存</th>
+                    <th class="py-2 text-left">状态</th>
+                    <th class="py-2 text-left">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <script>
+                    stockList.forEach(s=>{
+                        let status = s.num < 50 ? '库存偏低' : '库存充足';
+                        let color = s.num < 50 ? 'text-orange-500' : 'text-green-500';
+                        document.write(`
+                            <tr class="border-b">
+                                <td class="py-2">${s.name}</td>
+                                <td class="py-2">${s.unit}</td>
+                                <td class="py-2">${s.num}</td>
+                                <td class="py-2 ${color}">${status}</td>
+                                <td class="py-2">
+                                    <button onclick="location.href='stock-edit.html?id=${s.id}'" class="text-blue-500 mr-2">编辑</button>
+                                    <button onclick="delStock(${s.id})" class="text-red-500">删除</button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                </script>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

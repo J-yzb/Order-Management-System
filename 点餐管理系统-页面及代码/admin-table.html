@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>预订审核</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-100">
+<script>
+const u = JSON.parse(localStorage.getItem('currentUser'));
+if(!u || u.role !== 'admin'){
+    alert('无权限访问，请先以管理员身份登录');
+    location.href='login.html';
+}
+
+let bookList = JSON.parse(localStorage.getItem('bookList')) || [];
+
+// 同意预订
+function agreeBook(id){
+    bookList = bookList.map(item => {
+        if(item.id === id){
+            item.status = "预订成功";
+            item.reason = "";
+        }
+        return item;
+    });
+    localStorage.setItem('bookList', JSON.stringify(bookList));
+    alert('已同意该预订，用户将收到成功通知');
+    location.reload();
+}
+
+// 拒绝预订，填写理由
+function refuseBook(id){
+    let reason = prompt("请输入拒绝原因：");
+    if(!reason || reason.trim() === ""){
+        alert("拒绝原因不能为空");
+        return;
+    }
+    bookList = bookList.map(item => {
+        if(item.id === id){
+            item.status = "预订失败";
+            item.reason = reason;
+        }
+        return item;
+    });
+    localStorage.setItem('bookList', JSON.stringify(bookList));
+    alert('已拒绝该预订，原因已同步给用户');
+    location.reload();
+}
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex justify-between items-center">
+    <button onclick="location.href='admin.html'" class="text-gray-600"><i class="fa fa-arrow-left"></i> 返回</button>
+    <h2 class="text-lg font-bold">预订审核</h2>
+    <div></div>
+</nav>
+
+<div class="p-4 max-w-5xl mx-auto">
+    <div class="bg-white rounded-lg shadow p-4">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b">
+                    <th class="py-2 text-left">预订人</th>
+                    <th class="py-2 text-left">联系电话</th>
+                    <th class="py-2 text-left">用餐人数</th>
+                    <th class="py-2 text-left">预订日期</th>
+                    <th class="py-2 text-left">当前状态</th>
+                    <th class="py-2 text-left">审核操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <script>
+                    if(bookList.length === 0){
+                        document.write('<tr><td colspan="6" class="py-4 text-center text-gray-400">暂无预订申请</td></tr>');
+                    }else{
+                        bookList.forEach(book => {
+                            let statusText = book.status || "待审核";
+                            let statusColor = "";
+                            if(statusText === "待审核") statusColor = "text-orange-500";
+                            else if(statusText === "预订成功") statusColor = "text-green-500";
+                            else if(statusText === "预订失败") statusColor = "text-red-500";
+
+                            document.write(`
+                                <tr class="border-b">
+                                    <td class="py-2">${book.name}</td>
+                                    <td class="py-2">${book.tel}</td>
+                                    <td class="py-2">${book.num}人</td>
+                                    <td class="py-2">${book.bookDate}</td>
+                                    <td class="py-2 ${statusColor}">${statusText}</td>
+                                    <td class="py-2">
+                            `);
+                            // 仅待审核订单可操作，已处理则禁用按钮
+                            if(statusText === "待审核"){
+                                document.write(`
+                                    <button onclick="agreeBook(${book.id})" class="text-green-500 mr-4">同意</button>
+                                    <button onclick="refuseBook(${book.id})" class="text-red-500">拒绝</button>
+                                `);
+                            }else{
+                                document.write(`<span class="text-gray-400">已完成审核</span>`);
+                            }
+                            document.write(`
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                </script>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

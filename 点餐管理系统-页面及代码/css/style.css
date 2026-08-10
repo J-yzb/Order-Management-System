@@ -1,0 +1,174 @@
+/* ========== 动画 & 特色交互样式 ========== */
+/* 文字跑马灯（首页公告） */
+.marquee {
+    overflow: hidden;
+    white-space: nowrap;
+    background-color: #fff7ed;
+    color: #c2410c;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+.marquee-content {
+    display: inline-block;
+    animation: marquee 15s linear infinite;
+}
+@keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+/* 轮播图 */
+.carousel {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+.carousel-inner {
+    display: flex;
+    transition: transform 0.5s ease;
+}
+.carousel-item {
+    min-width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 24px;
+}
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.4);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.carousel-prev { left: 10px; }
+.carousel-next { right: 10px; }
+.carousel-indicators {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+}
+.indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+}
+.indicator.active {
+    background: #fff;
+}
+
+/* 图片悬浮放大 */
+.img-hover {
+    transition: transform 0.3s ease;
+}
+.img-hover:hover {
+    transform: scale(1.05);
+}
+
+/* 订单/预订状态标签 */
+.status-wait { color: #;
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ========== 1. 文字滚动公告 ========== */
+.marquee {
+    overflow: hidden;
+    white-space: nowrap;
+}
+.marquee-content {
+    display: inline-block;
+    animation: marquee 15s linear infinite;
+}
+@keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+/* ========== 2. 轮播图整体样式 ========== */
+.carousel {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+.carousel-inner {
+    display: flex;
+    transition: transform 0.5s ease;
+}
+.carousel-item {
+    min-width: 100%;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* 左右切换按钮 */
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.3);
+    color: #fff;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 10;
+}
+.carousel-prev {
+    left: 12px;
+}
+.carousel-next {
+    right: 12px;
+}
+.carousel-btn:hover {
+    background: rgba(0,0,0,0.5);
+}
+
+/* 底部小圆点指示器 */
+.carousel-indicators {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+.indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+}
+.indicator.active {
+    background: #ffffff;
+}

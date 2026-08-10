@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>菜品管理</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-100">
+<script>
+const u = JSON.parse(localStorage.getItem('currentUser'));
+if (!u || u.role !== 'admin') {
+    alert('无权限');
+    location.href = 'login.html';
+}
+
+let dishList = JSON.parse(localStorage.getItem('dishList')) || [];
+
+function deleteDish(id) {
+    if (confirm('确定删除该菜品？删除后无法恢复！')) {
+        dishList = dishList.filter(d => d.id !== id);
+        localStorage.setItem('dishList', JSON.stringify(dishList));
+        location.reload();
+    }
+}
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex justify-between items-center">
+    <button onclick="location.href='admin.html'" class="text-gray-600">
+        <i class="fa fa-arrow-left"></i> 返回
+    </button>
+    <h2 class="text-lg font-bold">菜品管理</h2>
+    <button onclick="location.href='admin-dish-edit.html'" class="bg-orange-500 text-white px-3 py-1 rounded text-sm">
+        新增菜品
+    </button>
+</nav>
+
+<div class="p-4 max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow p-4">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b">
+                    <th class="py-2 text-left">菜品名称</th>
+                    <th class="py-2 text-left">价格</th>
+                    <th class="py-2 text-left">分类</th>
+                    <th class="py-2 text-left">状态</th>
+                    <th class="py-2 text-left">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <script>
+                    if (dishList.length === 0) {
+                        document.write(`
+                            <tr>
+                                <td colspan="5" class="py-4 text-center text-gray-400">暂无菜品数据</td>
+                            </tr>
+                        `);
+                    } else {
+                        dishList.forEach(d => {
+                            document.write(`
+                                <tr class="border-b">
+                                    <td class="py-2">${d.name}</td>
+                                    <td class="py-2">¥${d.price}</td>
+                                    <td class="py-2">${d.cate}</td>
+                                    <td class="py-2 text-green-500">正常</td>
+                                    <td class="py-2">
+                                        <button onclick="location.href='admin-dish-edit.html?id=${d.id}'" class="text-blue-500 mr-3">编辑</button>
+                                        <button onclick="deleteDish(${d.id})" class="text-red-500">删除</button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                </script>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

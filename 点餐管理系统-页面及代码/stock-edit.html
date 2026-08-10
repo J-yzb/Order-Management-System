@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>物资编辑</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-100">
+<script>
+const loginUser = JSON.parse(localStorage.getItem('currentUser'));
+if (!loginUser || loginUser.role !== 'admin') {
+    alert('权限不足！该模块仅管理员可访问');
+    location.href = 'login.html';
+}
+
+let stockList = JSON.parse(localStorage.getItem('stockList')) || [];
+let params = new URLSearchParams(location.search);
+let editId = params.get('id');
+let editStock = null;
+
+if(editId){
+    editStock = stockList.find(s => s.id == editId);
+    if(editStock){
+        document.getElementById('stockName').value = editStock.name;
+        document.getElementById('stockUnit').value = editStock.unit;
+        document.getElementById('stockNum').value = editStock.num;
+    }
+}
+
+function saveStock() {
+    let name = document.getElementById('stockName').value.trim();
+    let unit = document.getElementById('stockUnit').value.trim();
+    let num = document.getElementById('stockNum').value.trim();
+    if (!name || !unit || !num) {
+        alert('请填写完整物资信息');
+        return;
+    }
+
+    if(editStock){
+        editStock.name = name;
+        editStock.unit = unit;
+        editStock.num = parseInt(num);
+    }else{
+        let newId = stockList.length > 0 ? Math.max(...stockList.map(s=>s.id)) + 1 : 1;
+        stockList.push({id:newId, name, unit, num:parseInt(num)});
+    }
+    localStorage.setItem('stockList', JSON.stringify(stockList));
+    alert('物资信息保存成功！');
+    location.href = 'stock.html';
+}
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex items-center">
+    <button onclick="location.href='stock.html'" class="text-gray-600 mr-3">
+        <i class="fa fa-arrow-left"></i> 返回
+    </button>
+    <h2 class="text-lg font-bold">物资编辑</h2>
+</nav>
+
+<div class="p-4 max-w-md mx-auto">
+    <div class="bg-white rounded-lg shadow p-4">
+        <div class="mb-3">
+            <label class="block text-sm mb-1">物资名称</label>
+            <input type="text" id="stockName" class="w-full border px-2 py-2 rounded" placeholder="请输入物资名称">
+        </div>
+        <div class="mb-3">
+            <label class="block text-sm mb-1">计量单位</label>
+            <input type="text" id="stockUnit" class="w-full border px-2 py-2 rounded" placeholder="如：套、桶、包">
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm mb-1">库存数量</label>
+            <input type="number" id="stockNum" class="w-full border px-2 py-2 rounded" placeholder="请输入库存数量">
+        </div>
+        <button onclick="saveStock()" class="w-full py-2 bg-orange-500 text-white rounded-lg">保存</button>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>订单管理</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-100">
+<script>
+const u = JSON.parse(localStorage.getItem('currentUser'));
+if(!u || u.role !== 'admin'){
+    alert('无权限');
+    location.href='login.html';
+}
+
+// 更新订单状态
+function changeStatus(orderNo, newStatus){
+    let orderList = JSON.parse(localStorage.getItem('orderList')) || [];
+    orderList = orderList.map(item => {
+        if(item.orderNo === orderNo){
+            item.status = newStatus;
+        }
+        return item;
+    });
+    localStorage.setItem('orderList', JSON.stringify(orderList));
+    alert(`状态已更新为：${newStatus}`);
+    location.reload();
+}
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex justify-between items-center">
+    <button onclick="location.href='admin.html'" class="text-gray-600"><i class="fa fa-arrow-left"></i> 返回</button>
+    <h2 class="text-lg font-bold">订单管理</h2>
+    <button onclick="location.href='admin-order-edit.html'" class="bg-orange-500 text-white px-3 py-1 rounded text-sm">新增订单</button>
+</nav>
+
+<div class="p-4 max-w-5xl mx-auto">
+    <div class="bg-white rounded-lg shadow p-4">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b">
+                    <th class="py-2 text-left">订单编号</th>
+                    <th class="py-2 text-left">类型</th>
+                    <th class="py-2 text-left">金额</th>
+                    <th class="py-2 text-left">当前状态</th>
+                    <th class="py-2 text-left">状态操作</th>
+                    <th class="py-2 text-left">管理</th>
+                </tr>
+            </thead>
+            <tbody>
+                <script>
+                    let orderList = JSON.parse(localStorage.getItem('orderList')) || [];
+                    if(orderList.length === 0){
+                        document.write('<tr><td colspan="6" class="py-4 text-center text-gray-400">暂无订单数据</td></tr>');
+                    }else{
+                        orderList.forEach(order => {
+                            let s = order.status;
+                            let color = "";
+                            if(s === "待接单") color = "text-orange-500";
+                            else if(s === "已接单") color = "text-blue-500";
+                            else if(s === "已派送") color = "text-purple-500";
+                            else if(s === "已送达") color = "text-green-500";
+
+                            document.write(`
+                                <tr class="border-b">
+                                    <td class="py-2">${order.orderNo}</td>
+                                    <td class="py-2">${order.orderType}</td>
+                                    <td class="py-2">¥${order.totalPrice}</td>
+                                    <td class="py-2 ${color}">${s}</td>
+                                    <td class="py-2">
+                            `);
+                            // 根据当前状态显示可操作按钮（顺序流转）
+                            if(s === "待接单"){
+                                document.write(`<button onclick="changeStatus('${order.orderNo}','已接单')" class="bg-blue-500 text-white px-2 py-1 rounded text-xs">接单</button>`);
+                            }else if(s === "已接单"){
+                                document.write(`<button onclick="changeStatus('${order.orderNo}','已派送')" class="bg-purple-500 text-white px-2 py-1 rounded text-xs">开始派送</button>`);
+                            }else if(s === "已派送"){
+                                document.write(`<button onclick="changeStatus('${order.orderNo}','已送达')" class="bg-green-500 text-white px-2 py-1 rounded text-xs">确认送达</button>`);
+                            }else{
+                                document.write(`<span class="text-gray-400">已完成</span>`);
+                            }
+                            document.write(`
+                                    </td>
+                                    <td class="py-2">
+                                        <button onclick="location.href='admin-order-edit.html?no=${order.orderNo}'" class="text-blue-500 mr-2">修改</button>
+                                        <button class="text-red-500">删除</button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                </script>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

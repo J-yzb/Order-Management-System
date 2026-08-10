@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>座位预订</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-50">
+<script>
+const cur = JSON.parse(localStorage.getItem('currentUser'));
+if (!cur) {
+    alert('请先登录');
+    location.href = 'login.html';
+}
+
+// 提交预订表单
+function submitBook(){
+    let name = document.getElementById('bookName').value.trim();
+    let tel = document.getElementById('bookTel').value.trim();
+    let num = document.getElementById('bookNum').value.trim();
+    let bookDate = document.getElementById('bookDate').value;
+
+    if(!name || !tel || !num || !bookDate){
+        alert('请填写完整信息，选择预订日期');
+        return;
+    }
+
+    let bookList = JSON.parse(localStorage.getItem('bookList')) || [];
+    let newId = bookList.length > 0 ? Math.max(...bookList.map(b=>b.id)) + 1 : 1;
+    // 初始状态：待审核
+    bookList.push({
+        id: newId,
+        name: name,
+        tel: tel,
+        num: num,
+        bookDate: bookDate,
+        status: "待审核",
+        reason: ""
+    });
+    localStorage.setItem('bookList', JSON.stringify(bookList));
+    alert('预订申请提交成功，请等待管理员审核');
+    location.reload();
+}
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex items-center sticky top-0">
+    <button onclick="location.href='index.html'" class="text-gray-600 mr-3">
+        <i class="fa fa-arrow-left"></i>
+    </button>
+    <h3 class="font-bold text-orange-500">座位预订</h3>
+</nav>
+
+<div class="p-4">
+    <!-- 预订填写区域 -->
+    <div class="bg-white rounded-lg shadow p-4 mb-4">
+        <div class="mb-3">
+            <label class="block text-sm mb-1">预订人姓名</label>
+            <input type="text" id="bookName" class="w-full border px-2 py-2 rounded" placeholder="请输入姓名">
+        </div>
+        <div class="mb-3">
+            <label class="block text-sm mb-1">联系电话</label>
+            <input type="text" id="bookTel" class="w-full border px-2 py-2 rounded" placeholder="请输入手机号">
+        </div>
+        <div class="mb-3">
+            <label class="block text-sm mb-1">用餐人数</label>
+            <input type="number" id="bookNum" class="w-full border px-2 py-2 rounded" placeholder="请输入人数">
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm mb-1">预订日期</label>
+            <input type="date" id="bookDate" class="w-full border px-2 py-2 rounded">
+        </div>
+        <button onclick="submitBook()" class="w-full py-2 bg-orange-500 text-white rounded-lg">提交预订</button>
+    </div>
+
+    <!-- 我的预订记录 & 审核结果 -->
+    <div class="bg-white rounded-lg shadow p-4">
+        <h4 class="font-semibold mb-3">我的预订记录</h4>
+        <div id="myBookList">
+            <script>
+                let bookList = JSON.parse(localStorage.getItem('bookList')) || [];
+                if(bookList.length === 0){
+                    document.write('<p class="text-gray-400 text-sm">暂无预订记录</p>');
+                }else{
+                    bookList.forEach(item => {
+                        let status = item.status;
+                        let color = "";
+                        let tip = "";
+
+                        if(status === "待审核"){
+                            color = "text-orange-500";
+                            tip = "等待管理员审核中";
+                        }else if(status === "预订成功"){
+                            color = "text-green-500";
+                            tip = "恭喜您，预订已通过！";
+                        }else if(status === "预订失败"){
+                            color = "text-red-500";
+                            tip = "很抱歉，预订未通过";
+                        }
+
+                        document.write(`
+                            <div class="border-b py-3 text-sm">
+                                <div class="flex justify-between items-center">
+                                    <span>${item.name} | ${item.tel} | ${item.num}人</span>
+                                    <span class="${color} font-medium">${status}</span>
+                                </div>
+                                <div class="text-gray-500 mt-1">
+                                    预订日期：${item.bookDate}
+                                </div>
+                                <div class="${color} mt-1">${tip}</div>
+                                ${item.reason ? `<div class="text-red-400 mt-1">拒绝原因：${item.reason}</div>` : ""}
+                            </div>
+                        `);
+                    });
+                }
+            </script>
+        </div>
+    </div>
+</div>
+</body>
+</html>

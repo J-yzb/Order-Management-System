@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>用户中心</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-50">
+<script>
+const cur = JSON.parse(localStorage.getItem('currentUser'));
+if (!cur) {
+    alert('请先登录');
+    location.href = 'login.html';
+}
+function logout(){
+    localStorage.removeItem('currentUser');
+    location.href = 'login.html';
+}
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex items-center sticky top-0">
+    <button onclick="location.href='index.html'" class="text-gray-600 mr-3">
+        <i class="fa fa-arrow-left"></i>
+    </button>
+    <h3 class="font-bold text-orange-500">用户中心</h3>
+</nav>
+
+<div class="p-4">
+    <div class="bg-white rounded-lg shadow p-4 text-center">
+        <div class="w-16 h-16 rounded-full bg-orange-500 text-white flex items-center justify-center text-xl mx-auto mb-3">
+            <i class="fa fa-user"></i>
+        </div>
+        <p class="mb-1">账号：<script>document.write(cur.username)</script></p>
+        <p class="mb-4 text-gray-500">身份：<script>document.write(cur.role==='admin'?'管理员':'普通用户')</script></p>
+        <button onclick="logout()" class="w-full py-2 border border-red-500 text-red-500 rounded-lg">退出登录</button>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>我的订单</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-50">
+<script>
+const cur = JSON.parse(localStorage.getItem('currentUser'));
+if (!cur) {
+    alert('请先登录');
+    location.href = 'login.html';
+}
+let orderList = JSON.parse(localStorage.getItem('orderList')) || [];
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex items-center sticky top-0">
+    <button onclick="location.href='index.html'" class="text-gray-600 mr-3">
+        <i class="fa fa-arrow-left"></i>
+    </button>
+    <h3 class="font-bold text-orange-500">我的订单</h3>
+</nav>
+
+<div class="p-4">
+    <div id="orderContainer">
+        <script>
+            if(orderList.length === 0){
+                document.write(`
+                    <div class="bg-white rounded-lg shadow p-8 text-center">
+                        <p class="text-gray-400">暂无订单，快去点餐吧！</p>
+                        <button onclick="location.href='index.html'" class="mt-4 px-4 py-1 bg-orange-500 text-white rounded">去点餐</button>
+                    </div>
+                `);
+            }else{
+                orderList.forEach(order => {
+                    // 状态样式区分
+                    let statusText = order.status;
+                    let statusColor = "";
+                    if(statusText === "待接单") statusColor = "text-orange-500";
+                    else if(statusText === "已接单") statusColor = "text-blue-500";
+                    else if(statusText === "已派送") statusColor = "text-purple-500";
+                    else if(statusText === "已送达") statusColor = "text-green-500";
+
+                    document.write(`
+                        <div class="bg-white rounded-lg shadow p-4 mb-4">
+                            <div class="flex justify-between items-center border-b pb-2 mb-2">
+                                <span class="text-sm text-gray-500">订单编号：${order.orderNo}</span>
+                                <span class="text-sm font-medium ${statusColor}">${statusText}</span>
+                            </div>
+                            <div class="text-sm mb-2">
+                                <span class="text-gray-500">下单类型：</span>${order.orderType}
+                            </div>
+                            ${order.orderType === "外卖" ? `
+                                <div class="text-sm mb-2">
+                                    <span class="text-gray-500">配送地址：</span>${order.address}
+                                </div>
+                                <div class="text-sm mb-2">
+                                    <span class="text-gray-500">联系电话：</span>${order.phone}
+                                </div>
+                            ` : ""}
+                            <div class="border-t pt-2">
+                                <p class="text-sm font-medium mb-2">商品清单</p>
+                    `);
+
+                    order.goods.forEach(good => {
+                        let itemTotal = good.price * good.count;
+                        document.write(`
+                            <div class="flex justify-between text-sm py-1">
+                                <div>${good.name} <span class="text-gray-400">${good.taste}</span></div>
+                                <div>x${good.count}  ¥${itemTotal}</div>
+                            </div>
+                        `);
+                    });
+
+                    document.write(`
+                            </div>
+                            <div class="flex justify-between font-bold mt-3 pt-2 border-t">
+                                <span>订单总计</span>
+                                <span class="text-orange-500">¥${order.totalPrice}</span>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+        </script>
+    </div>
+</div>
+</body>
+</html>

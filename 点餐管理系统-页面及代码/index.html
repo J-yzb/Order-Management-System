@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>点餐首页</title>
+<!-- 引入全局CSS -->
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-50">
+<script>
+const cur = JSON.parse(localStorage.getItem('currentUser'));
+if (!cur || cur.role === undefined) {
+    alert('请先登录！');
+    location.href = 'login.html';
+}
+
+// 加入购物车
+function addToCart(name, price, type) {
+    let count = prompt("请输入购买数量", 1);
+    if (!count || isNaN(count) || count < 1) {
+        alert("请输入有效的数量");
+        return;
+    }
+    count = parseInt(count);
+
+    let taste;
+    if (type === 'drink') {
+        taste = prompt("请选择：加冰/少冰/常温/热", "常温");
+    } else {
+        taste = prompt("请输入口味：不辣/微辣/少盐/正常", "正常");
+    }
+    if (taste === null) return;
+
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const index = cart.findIndex(item => item.name === name && item.taste === taste);
+    if (index >= 0) {
+        cart[index].count += count;
+    } else {
+        cart.push({ name, price, count, taste });
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert(`${name}\n选择：${taste}\n数量：${count}\n已加入购物车`);
+}
+
+// 分类切换
+function showCategory(cate) {
+    document.querySelectorAll('.cate-item').forEach(el => el.classList.add('hidden'));
+    document.getElementById(cate).classList.remove('hidden');
+}
+
+// 外卖跳转 填写地址电话
+function goTakeout() {
+    let address = prompt("请输入配送地址：", "");
+    if (!address) {
+        alert("配送地址不能为空！");
+        return;
+    }
+    let phone = prompt("请输入联系电话：", "");
+    if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+        alert("请输入有效的11位手机号码！");
+        return;
+    }
+    localStorage.setItem('takeoutAddr', address);
+    localStorage.setItem('takeoutPhone', phone);
+    location.href = "takeout.html";
+}
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex justify-between sticky top-0 z-10">
+    <h3 class="font-bold text-orange-500">点餐系统</h3>
+    <div class="flex gap-3 items-center">
+        <button onclick="location.href='book-table.html'" class="text-sm"><i class="fa fa-book"></i></button>
+        <button onclick="location.href='cart.html'" class="text-sm"><i class="fa fa-shopping-cart"></i></button>
+        <button onclick="location.href='order.html'" class="text-sm"><i class="fa fa-list"></i></button>
+        <button onclick="location.href='user-center.html'" class="text-sm"><i class="fa fa-user"></i></button>
+    </div>
+</nav>
+
+<div class="p-4">
+    <!-- 文字滚动公告 -->
+    <div class="marquee bg-orange-100 text-orange-800 py-2 px-4 rounded mb-4">
+        <div class="marquee-content">🎉 开业特惠：满100减20 | 新用户注册送5元优惠券 | 外卖满30免配送费！</div>
+    </div>
+
+    <!-- 轮播图（绑定点击事件） -->
+    <div class="carousel mb-4">
+        <div class="carousel-inner">
+            <div class="carousel-item" style="background: #f97316;">
+                热门菜品推荐
+            </div>
+            <div class="carousel-item" style="background: #ea580c;">
+                今日特惠活动
+            </div>
+            <div class="carousel-item" style="background: #c2410c;">
+                会员专享福利
+            </div>
+        </div>
+        <button class="carousel-btn carousel-prev" onclick="prevSlide()">&lt;</button>
+        <button class="carousel-btn carousel-next" onclick="nextSlide()">&gt;</button>
+        <div class="carousel-indicators">
+            <div class="indicator active" onclick="goToSlide(0)"></div>
+            <div class="indicator" onclick="goToSlide(1)"></div>
+            <div class="indicator" onclick="goToSlide(2)"></div>
+        </div>
+    </div>
+
+    <!-- 堂食/外卖切换 -->
+    <div class="flex gap-2 mb-4">
+        <button class="px-4 py-1 bg-orange-500 text-white rounded-full text-sm">堂食点餐</button>
+        <button onclick="goTakeout()" class="px-4 py-1 bg-white border border-orange-500 text-orange-500 rounded-full text-sm">外卖点餐</button>
+    </div>
+
+    <!-- 菜品分类 -->
+    <div class="flex gap-2 mb-4">
+        <button onclick="showCategory('hot')" class="px-3 py-1 bg-orange-500 text-white rounded-full text-sm">热菜</button>
+        <button onclick="showCategory('cold')" class="px-3 py-1 bg-white border rounded-full text-sm">凉菜</button>
+        <button onclick="showCategory('drink')" class="px-3 py-1 bg-white border rounded-full text-sm">饮品</button>
+    </div>
+
+    <!-- 热菜 -->
+    <div id="hot" class="cate-item grid grid-cols-2 gap-3">
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/鱼香肉丝.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">鱼香肉丝</p>
+            <p class="text-orange-500 font-bold">¥32</p>
+            <button onclick="addToCart('鱼香肉丝',32,'food')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加入购物车</button>
+        </div>
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/水煮鱼.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">水煮鱼</p>
+            <p class="text-orange-500 font-bold">¥58</p>
+            <button onclick="addToCart('水煮鱼',58,'food')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加入购物车</button>
+        </div>
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/麻婆豆腐.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">麻婆豆腐</p>
+            <p class="text-orange-500 font-bold">¥18</p>
+            <button onclick="addToCart('麻婆豆腐',18,'food')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加入购物车</button>
+        </div>
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/回锅肉.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">回锅肉</p>
+            <p class="text-orange-500 font-bold">¥36</p>
+            <button onclick="addToCart('回锅肉',36,'food')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加入购物车</button>
+        </div>
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/宫保鸡丁.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">宫保鸡丁</p>
+            <p class="text-orange-500 font-bold">¥30</p>
+            <button onclick="addToCart('宫保鸡丁',30,'food')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加入购物车</button>
+        </div>
+    </div>
+
+    <!-- 凉菜 -->
+    <div id="cold" class="cate-item hidden grid grid-cols-2 gap-3">
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/拍黄瓜.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">拍黄瓜</p>
+            <p class="text-orange-500 font-bold">¥12</p>
+            <button onclick="addToCart('拍黄瓜',12,'food')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加购</button>
+        </div>
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/凉拌木耳.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">凉拌木耳</p>
+            <p class="text-orange-500 font-bold">¥16</p>
+            <button onclick="addToCart('凉拌木耳',16,'food')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加购</button>
+        </div>
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/口水鸡.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">口水鸡</p>
+            <p class="text-orange-500 font-bold">¥36</p>
+            <button onclick="addToCart('口水鸡',36,'food')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加购</button>
+        </div>
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/皮蛋豆腐.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">皮蛋豆腐</p>
+            <p class="text-orange-500 font-bold">¥15</p>
+            <button onclick="addToCart('皮蛋豆腐',15,'food')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加购</button>
+        </div>
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/酱牛肉.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">酱牛肉</p>
+            <p class="text-orange-500 font-bold">¥48</p>
+            <button onclick="addToCart('酱牛肉',48,'food')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加购</button>
+        </div>
+    </div>
+
+    <!-- 饮品 -->
+    <div id="drink" class="cate-item hidden grid grid-cols-2 gap-3">
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/酸梅汤.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">酸梅汤</p>
+            <p class="text-orange-500 font-bold">¥8</p>
+            <button onclick="addToCart('酸梅汤',8,'drink')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加购</button>
+        </div>
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/柠檬水.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">柠檬水</p>
+            <p class="text-orange-500 font-bold">¥6</p>
+            <button onclick="addToCart('柠檬水',6,'drink')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加购</button>
+        </div>
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/绿豆汤.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">绿豆汤</p>
+            <p class="text-orange-500 font-bold">¥7</p>
+            <button onclick="addToCart('绿豆汤',7,'drink')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加购</button>
+        </div>
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/西瓜汁.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">西瓜汁</p>
+            <p class="text-orange-500 font-bold">¥15</p>
+            <button onclick="addToCart('西瓜汁',15,'drink')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加购</button>
+        </div>
+        <div class="bg-white rounded-lg p-2 shadow">
+            <img src="img/啤酒.jpg" class="w-full h-45 object-cover rounded">
+            <p class="text-sm font-medium mt-1">啤酒</p>
+            <p class="text-orange-500 font-bold">¥12</p>
+            <button onclick="addToCart('啤酒',12,'drink')" class="w-full bg-orange-500 text-white text-xs py-1 rounded mt-1">加购</button>
+        </div>
+    </div>
+</div>
+
+<!-- 轮播核心JS 放在页面底部 -->
+<script>
+let currentIndex = 0;
+const totalSlides = 3;
+
+// 更新轮播视图 + 指示器
+function updateCarousel() {
+    const inner = document.querySelector('.carousel-inner');
+    const dots = document.querySelectorAll('.indicator');
+    inner.style.transform = `translateX(-${currentIndex * 100}%)`;
+    dots.forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === currentIndex);
+    });
+}
+
+// 上一张
+function prevSlide() {
+    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+    updateCarousel();
+}
+
+// 下一张
+function nextSlide() {
+    currentIndex = (currentIndex + 1) % totalSlides;
+    updateCarousel();
+}
+
+// 点击小圆点跳转
+function goToSlide(index) {
+    currentIndex = index;
+    updateCarousel();
+}
+
+// 页面加载完成初始化
+window.onload = updateCarousel;
+</script>
+
+</body>
+</html>

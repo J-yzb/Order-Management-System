@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>购物车</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-50">
+<script>
+const cur = JSON.parse(localStorage.getItem('currentUser'));
+if (!cur) {
+    alert('请先登录');
+    location.href = 'login.html';
+}
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let takeoutAddr = localStorage.getItem('takeoutAddr') || "";
+let takeoutPhone = localStorage.getItem('takeoutPhone') || "";
+let orderType = takeoutAddr ? "外卖" : "堂食";
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex items-center sticky top-0">
+    <button onclick="location.href='index.html'" class="text-gray-600 mr-3">
+        <i class="fa fa-arrow-left"></i>
+    </button>
+    <h3 class="font-bold text-orange-500">我的购物车</h3>
+</nav>
+
+<div class="p-4">
+    <div id="cartBox">
+        <script>
+            if(cart.length === 0){
+                document.write(`
+                    <div class="bg-white rounded-lg shadow p-8 text-center">
+                        <p class="text-gray-400">购物车暂无商品</p>
+                        <button onclick="location.href='index.html'" class="mt-4 px-4 py-1 bg-orange-500 text-white rounded">去点餐</button>
+                    </div>
+                `);
+            }else{
+                let total = 0;
+                cart.forEach((item,index)=>{
+                    let itemTotal = item.price * item.count;
+                    total += itemTotal;
+                    document.write(`
+                        <div class="bg-white rounded-lg shadow p-3 mb-2 flex justify-between items-center">
+                            <div>
+                                <p class="font-medium">${item.name}</p>
+                                <p class="text-xs text-gray-400">${item.taste}</p>
+                                <p class="text-orange-500">¥${item.price} × ${item.count}</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-orange-500 font-bold">¥${itemTotal}</div>
+                                <!-- 删除按钮 -->
+                                <button onclick="deleteItem(${index})" class="text-red-500 text-xl">
+                                    <i class="fa fa-trash-o"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `);
+                });
+                document.write(`
+                    <div class="bg-white rounded-lg shadow p-3 mt-4">
+                        <div class="flex justify-between font-bold mb-3">
+                            <span>合计</span>
+                            <span class="text-orange-500">¥${total}</span>
+                        </div>
+                        <button onclick="submitOrder(${total})" class="w-full bg-orange-500 text-white py-2 rounded-lg">提交订单</button>
+                    </div>
+                `);
+            }
+        </script>
+    </div>
+</div>
+
+<script>
+// 删除购物车商品（点击跳转到确认页面）
+function deleteItem(index) {
+    // 跳转到删除确认页面，携带要删除的下标
+    location.href = `cart-delete.html?index=${index}`;
+}
+
+function submitOrder(totalPrice){
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    if(cart.length === 0){
+        alert("购物车为空，无法下单");
+        return;
+    }
+    let now = new Date();
+    let orderNo = now.getFullYear() +
+        (now.getMonth()+1).toString().padStart(2,'0') +
+        now.getDate().toString().padStart(2,'0') +
+        now.getHours().toString().padStart(2,'0') +
+        now.getMinutes().toString().padStart(2,'0') +
+        now.getSeconds().toString().padStart(2,'0');
+
+    let newOrder = {
+        orderNo: orderNo,
+        orderType: orderType,
+        address: takeoutAddr,
+        phone: takeoutPhone,
+        goods: cart,
+        totalPrice: totalPrice,
+        status: "待接单"
+    };
+
+    let orderList = JSON.parse(localStorage.getItem('orderList')) || [];
+    orderList.unshift(newOrder);
+    localStorage.setItem('orderList', JSON.stringify(orderList));
+
+    localStorage.removeItem('cart');
+    localStorage.removeItem('takeoutAddr');
+    localStorage.removeItem('takeoutPhone');
+
+    alert(`下单成功！订单号：${orderNo}\n当前状态：待接单`);
+    location.href = "order.html";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>点餐系统 - 总首页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+<script>
+    // 全局登录校验
+    const userInfo = JSON.parse(localStorage.getItem('currentUser'));
+</script>
+
+<!-- 顶部导航 -->
+<header class="bg-white shadow py-4 px-4 sticky top-0 z-10">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+        <h1 class="text-xl font-bold text-orange-500">餐饮点餐管理系统</h1>
+        <div id="userStatus" class="text-sm">
+            <script>
+                if(userInfo){
+                    document.write(`
+                        <span class="mr-2">欢迎：${userInfo.username}</span>
+                        <button onclick="logout()" class="text-red-500">退出登录</button>
+                    `);
+                }else{
+                    document.write(`
+                        <a href="login.html" class="text-orange-500">立即登录</a>
+                    `);
+                }
+            </script>
+        </div>
+    </div>
+</header>
+
+<!-- 主内容区 -->
+<main class="max-w-4xl mx-auto p-4 mt-6">
+    <!-- 功能分区卡片 -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <!-- 1. 点餐相关 -->
+        <div class="bg-white rounded-lg shadow p-5 text-center hover:shadow-lg transition">
+            <i class="fa fa-cutlery text-3xl text-orange-500 mb-2"></i>
+            <h3 class="font-medium">堂食点餐</h3>
+            <p class="text-gray-400 text-xs mt-1">浏览菜品、加入购物车</p>
+            <button onclick="goPage('index.html')" class="mt-3 px-4 py-1 bg-orange-500 text-white rounded text-sm">进入</button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-5 text-center hover:shadow-lg transition">
+            <i class="fa fa-motorcycle text-3xl text-orange-500 mb-2"></i>
+            <h3 class="font-medium">外卖点餐</h3>
+            <p class="text-gray-400 text-xs mt-1">填写地址电话，外卖配送</p>
+            <button onclick="goPage('index.html')" class="mt-3 px-4 py-1 bg-orange-500 text-white rounded text-sm">进入</button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-5 text-center hover:shadow-lg transition">
+            <i class="fa fa-shopping-cart text-3xl text-orange-500 mb-2"></i>
+            <h3 class="font-medium">购物车</h3>
+            <p class="text-gray-400 text-xs mt-1">查看已选商品、结算</p>
+            <button onclick="goPage('cart.html')" class="mt-3 px-4 py-1 bg-orange-500 text-white rounded text-sm">进入</button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-5 text-center hover:shadow-lg transition">
+            <i class="fa fa-list-alt text-3xl text-orange-500 mb-2"></i>
+            <h3 class="font-medium">我的订单</h3>
+            <p class="text-gray-400 text-xs mt-1">查询历史订单</p>
+            <button onclick="goPage('order.html')" class="mt-3 px-4 py-1 bg-orange-500 text-white rounded text-sm">进入</button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-5 text-center hover:shadow-lg transition">
+            <i class="fa fa-table text-3xl text-orange-500 mb-2"></i>
+            <h3 class="font-medium">座位预订</h3>
+            <p class="text-gray-400 text-xs mt-1">提前预订用餐座位</p>
+            <button onclick="goPage('book-table.html')" class="mt-3 px-4 py-1 bg-orange-500 text-white rounded text-sm">进入</button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-5 text-center hover:shadow-lg transition">
+            <i class="fa fa-user text-3xl text-orange-500 mb-2"></i>
+            <h3 class="font-medium">个人中心</h3>
+            <p class="text-gray-400 text-xs mt-1">查看账号、退出登录</p>
+            <button onclick="goPage('user-center.html')" class="mt-3 px-4 py-1 bg-orange-500 text-white rounded text-sm">进入</button>
+        </div>
+    </div>
+
+    <!-- 管理员专属模块（登录为管理员才显示） -->
+    <div id="adminModule" class="mt-8">
+        <script>
+            if(userInfo && userInfo.role === 'admin'){
+                document.write(`
+                    <h2 class="text-lg font-bold mb-4 border-l-4 border-orange-500 pl-2">管理员功能模块</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="bg-white rounded-lg shadow p-5 text-center hover:shadow-lg transition">
+                            <i class="fa fa-cogs text-3xl text-slate-700 mb-2"></i>
+                            <h3 class="font-medium">管理后台</h3>
+                            <p class="text-gray-400 text-xs mt-1">后台总控制台</p>
+                            <button onclick="location.href='admin.html'" class="mt-3 px-4 py-1 bg-slate-700 text-white rounded text-sm">进入</button>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-5 text-center hover:shadow-lg transition">
+                            <i class="fa fa-archive text-3xl text-slate-700 mb-2"></i>
+                            <h3 class="font-medium">库存物资管理</h3>
+                            <p class="text-gray-400 text-xs mt-1">物资出入库、库存查看</p>
+                            <button onclick="location.href='stock.html'" class="mt-3 px-4 py-1 bg-slate-700 text-white rounded text-sm">进入</button>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-5 text-center hover:shadow-lg transition">
+                            <i class="fa fa-bar-chart text-3xl text-slate-700 mb-2"></i>
+                            <h3 class="font-medium">经营统计</h3>
+                            <p class="text-gray-400 text-xs mt-1">订单、营收数据统计</p>
+                            <button onclick="location.href='statistics.html'" class="mt-3 px-4 py-1 bg-slate-700 text-white rounded text-sm">进入</button>
+                        </div>
+                    </div>
+                `);
+            }
+        </script>
+    </div>
+
+    <!-- 未登录提示 -->
+    <div id="tipText" class="mt-8 text-center text-gray-500">
+        <script>
+            if(!userInfo){
+                document.write(`<p>请先 <a href="login.html" class="text-orange-500">登录</a> 后使用完整功能</p>`);
+            }
+        </script>
+    </div>
+</main>
+
+<script>
+    // 页面跳转 + 登录拦截
+    function goPage(url){
+        if(!userInfo){
+            alert("请先登录！");
+            location.href = "login.html";
+            return;
+        }
+        location.href = url;
+    }
+
+    // 退出登录
+    function logout(){
+        localStorage.removeItem("currentUser");
+        localStorage.removeItem("cart");
+        localStorage.removeItem("takeoutAddr");
+        localStorage.removeItem("takeoutPhone");
+        alert("已退出登录");
+        location.reload();
+    }
+</script>
+</body>
+</html>

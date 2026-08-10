@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>经营统计</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-100">
+<script>
+const loginUser = JSON.parse(localStorage.getItem('currentUser'));
+if (!loginUser || loginUser.role !== 'admin') {
+    alert('权限不足！该模块仅管理员可访问');
+    location.href = 'login.html';
+}
+
+let statList = JSON.parse(localStorage.getItem('statList')) || [
+    {id:1, name:'鱼香肉丝', sale:216, money:6912},
+    {id:2, name:'水煮鱼', sale:168, money:9744}
+];
+
+function delStat(id){
+    if(confirm('确定删除该条统计数据？')){
+        statList = statList.filter(s => s.id !== id);
+        localStorage.setItem('statList', JSON.stringify(statList));
+        location.reload();
+    }
+}
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex justify-between items-center">
+    <button onclick="location.href='admin.html'" class="text-gray-600">
+        <i class="fa fa-arrow-left"></i> 返回后台
+    </button>
+    <h2 class="text-lg font-bold">经营数据统计</h2>
+    <button onclick="location.href='statistics-edit.html'" class="bg-orange-500 text-white px-3 py-1 rounded text-sm">新增数据</button>
+</nav>
+
+<div class="p-4 mt-4 max-w-4xl mx-auto">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+        <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-gray-500 text-sm">今日订单</p>
+            <p class="text-2xl font-bold mt-1 text-orange-500">36</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-gray-500 text-sm">今日营收</p>
+            <p class="text-2xl font-bold mt-1 text-green-500">¥2680</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-gray-500 text-sm">本月订单</p>
+            <p class="text-2xl font-bold mt-1 text-blue-500">986</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-gray-500 text-sm">本月营收</p>
+            <p class="text-2xl font-bold mt-1 text-purple-500">¥72560</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="font-semibold mb-3">菜品销量排行</h3>
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b">
+                    <th class="py-2 text-left">排名</th>
+                    <th class="py-2 text-left">菜品名称</th>
+                    <th class="py-2 text-left">销量</th>
+                    <th class="py-2 text-left">销售额</th>
+                    <th class="py-2 text-left">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <script>
+                    statList.forEach((s,idx)=>{
+                        document.write(`
+                            <tr class="border-b">
+                                <td class="py-2">${idx+1}</td>
+                                <td class="py-2">${s.name}</td>
+                                <td class="py-2">${s.sale}</td>
+                                <td class="py-2">¥${s.money}</td>
+                                <td class="py-2">
+                                    <button onclick="location.href='statistics-edit.html?id=${s.id}'" class="text-blue-500 mr-2">编辑</button>
+                                    <button onclick="delStat(${s.id})" class="text-red-500">删除</button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                </script>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

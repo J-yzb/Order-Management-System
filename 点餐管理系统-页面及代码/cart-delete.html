@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>确认删除</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+
+<div class="bg-white p-6 rounded-lg shadow-md w-4/5 max-w-sm">
+    <h3 class="text-lg font-bold text-center mb-4">确定要删除该商品吗？</h3>
+    <div class="flex gap-3">
+        <button id="cancel" class="flex-1 py-2 border border-gray-300 rounded-lg">取消</button>
+        <button id="confirm" class="flex-1 py-2 bg-red-500 text-white rounded-lg">确认删除</button>
+    </div>
+</div>
+
+<script>
+// 获取要删除的下标
+let params = new URLSearchParams(location.search);
+let index = params.get('index');
+
+// 取消
+document.getElementById('cancel').onclick = () => {
+    location.href = 'cart.html';
+}
+
+// 确认删除
+document.getElementById('confirm').onclick = () => {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart.splice(index, 1);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert('删除成功');
+    location.href = 'cart.html';
+}
+</script>
+</body>
+</html>

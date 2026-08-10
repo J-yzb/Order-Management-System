@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统计数据编辑</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-100">
+<script>
+const loginUser = JSON.parse(localStorage.getItem('currentUser'));
+if (!loginUser || loginUser.role !== 'admin') {
+    alert('权限不足！该模块仅管理员可访问');
+    location.href = 'login.html';
+}
+
+let statList = JSON.parse(localStorage.getItem('statList')) || [];
+let params = new URLSearchParams(location.search);
+let editId = params.get('id');
+let editStat = null;
+
+if(editId){
+    editStat = statList.find(s => s.id == editId);
+    if(editStat){
+        document.getElementById('dishName').value = editStat.name;
+        document.getElementById('saleNum').value = editStat.sale;
+        document.getElementById('saleMoney').value = editStat.money;
+    }
+}
+
+function saveData() {
+    let name = document.getElementById('dishName').value.trim();
+    let sale = document.getElementById('saleNum').value.trim();
+    let money = document.getElementById('saleMoney').value.trim();
+    if (!name || !sale || !money) {
+        alert('请填写完整数据');
+        return;
+    }
+
+    if(editStat){
+        editStat.name = name;
+        editStat.sale = parseInt(sale);
+        editStat.money = parseInt(money);
+    }else{
+        let newId = statList.length > 0 ? Math.max(...statList.map(s=>s.id)) + 1 : 1;
+        statList.push({id:newId, name, sale:parseInt(sale), money:parseInt(money)});
+    }
+    localStorage.setItem('statList', JSON.stringify(statList));
+    alert('统计数据保存成功！');
+    location.href = 'statistics.html';
+}
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex items-center">
+    <button onclick="location.href='statistics.html'" class="text-gray-600 mr-3">
+        <i class="fa fa-arrow-left"></i> 返回
+    </button>
+    <h2 class="text-lg font-bold">统计数据编辑</h2>
+</nav>
+
+<div class="p-4 max-w-md mx-auto">
+    <div class="bg-white rounded-lg shadow p-4">
+        <div class="mb-3">
+            <label class="block text-sm mb-1">菜品名称</label>
+            <input type="text" id="dishName" class="w-full border px-2 py-2 rounded" placeholder="请输入菜品名称">
+        </div>
+        <div class="mb-3">
+            <label class="block text-sm mb-1">销量</label>
+            <input type="number" id="saleNum" class="w-full border px-2 py-2 rounded" placeholder="请输入销量">
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm mb-1">销售额</label>
+            <input type="number" id="saleMoney" class="w-full border px-2 py-2 rounded" placeholder="请输入销售额">
+        </div>
+        <button onclick="saveData()" class="w-full py-2 bg-orange-500 text-white rounded-lg">保存数据</button>
+    </div>
+</div>
+</body>
+</html>

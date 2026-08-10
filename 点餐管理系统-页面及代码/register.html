@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>用户注册</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<div class="bg-white p-6 rounded-lg shadow-md w-80">
+    <h2 class="text-xl font-bold text-center mb-4">用户注册</h2>
+    <div class="mb-3">
+        <label class="block text-sm mb-1">账号（6位数字/字母）</label>
+        <input type="text" id="regUser" class="w-full border px-2 py-1 rounded" placeholder="请输入账号">
+    </div>
+    <div class="mb-4">
+        <label class="block text-sm mb-1">密码（8位数字/字母，无特殊字符）</label>
+        <input type="password" id="regPwd" class="w-full border px-2 py-1 rounded" placeholder="请输入密码">
+    </div>
+    <button onclick="doRegister()" class="w-full bg-orange-500 text-white py-2 rounded mb-3">注册</button>
+    <p class="text-center text-sm text-gray-500">已有账号？<a href="login.html" class="text-orange-500">去登录</a></p>
+</div>
+
+<script>
+// 新的管理员账号密码
+const ADMIN_USER = "20260529";
+const ADMIN_PWD = "1234qwer";
+
+function doRegister(){
+    let user = document.getElementById('regUser').value.trim();
+    let pwd = document.getElementById('regPwd').value.trim();
+
+    // 账号校验：6位数字或字母
+    if(!/^[0-9a-zA-Z]{6}$/.test(user)){
+        alert('账号必须为6位数字或字母！');
+        return;
+    }
+    // 密码校验：8位数字或字母，无特殊字符
+    if(!/^[0-9a-zA-Z]{8}$/.test(pwd)){
+        alert('密码必须为8位数字或字母，且不能包含特殊字符！');
+        return;
+    }
+    // 不能和管理员账号重名
+    if(user === ADMIN_USER){
+        alert('该账号为管理员专用，请更换！');
+        return;
+    }
+
+    // 读取已有用户列表
+    let users = JSON.parse(localStorage.getItem('regUsers')) || [];
+    if(users.find(u => u.username === user)){
+        alert('该账号已被注册！');
+        return;
+    }
+
+    // 注册普通用户
+    users.push({username:user, password:pwd, role:'user'});
+    localStorage.setItem('regUsers', JSON.stringify(users));
+    alert('注册成功！请登录');
+    location.href = 'login.html';
+}
+</script>
+</body>
+</html>

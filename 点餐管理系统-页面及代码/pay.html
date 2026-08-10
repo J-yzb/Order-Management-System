@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>订单支付</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+</head>
+<body class="bg-gray-50">
+<script>
+// 登录校验
+const cur = JSON.parse(localStorage.getItem('currentUser'));
+if (!cur) {
+    alert('请先登录');
+    location.href = 'login.html';
+}
+// 获取购物车数据
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let totalPrice = 0;
+cart.forEach(item => {
+    totalPrice += item.price * item.count;
+});
+</script>
+
+<nav class="bg-white shadow px-4 py-3 flex items-center sticky top-0">
+    <button onclick="history.go(-1)" class="text-gray-600 mr-3">
+        <i class="fa fa-arrow-left"></i> 返回
+    </button>
+    <h3 class="font-bold text-orange-500">订单支付</h3>
+</nav>
+
+<div class="p-4">
+    <!-- 订单金额 -->
+    <div class="bg-white rounded-lg shadow p-4 mb-4">
+        <h4 class="font-semibold mb-2">待支付金额</h4>
+        <p class="text-2xl text-orange-500 font-bold">¥<script>document.write(totalPrice)</script></p>
+    </div>
+
+    <!-- 支付方式选择 -->
+    <div class="bg-white rounded-lg shadow p-4 mb-4">
+        <h4 class="font-semibold mb-3">选择支付方式</h4>
+        <div class="space-y-3">
+            <label class="flex items-center border p-3 rounded-lg cursor-pointer">
+                <input type="radio" name="payType" value="微信支付" checked class="mr-2">
+                <i class="fa fa-wechat text-green-500 text-xl mr-2"></i>
+                <span>微信支付</span>
+            </label>
+            <label class="flex items-center border p-3 rounded-lg cursor-pointer">
+                <input type="radio" name="payType" value="支付宝" class="mr-2">
+                <i class="fa fa-alipay text-blue-500 text-xl mr-2"></i>
+                <span>支付宝</span>
+            </label>
+            <label class="flex items-center border p-3 rounded-lg cursor-pointer">
+                <input type="radio" name="payType" value="余额支付" class="mr-2">
+                <i class="fa fa-money text-yellow-500 text-xl mr-2"></i>
+                <span>余额支付</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- 支付按钮 -->
+    <button onclick="doPay()" class="w-full py-3 bg-orange-500 text-white rounded-lg text-lg">
+        确认支付 ¥<script>document.write(totalPrice)</script>
+    </button>
+</div>
+
+<script>
+// 模拟支付流程
+function doPay(){
+    if(cart.length === 0){
+        alert("暂无商品，无法支付！");
+        return;
+    }
+    let payType = document.querySelector('input[name="payType"]:checked').value;
+    alert(`选择${payType}，支付成功！`);
+    // 支付完成清空购物车
+    localStorage.removeItem('cart');
+    // 跳转到我的订单页面
+    location.href = "order.html";
+}
+</script>
+</body>
+</html>
